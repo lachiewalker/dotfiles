@@ -7,5 +7,8 @@ DIR="$(dirname "$0")"
 # Keys like gtk-theme/icon-theme are Yaru-specific — may not apply after an OS upgrade
 dconf load /org/gnome/desktop/interface/ < "$DIR/interface.ini"
 
+# Restore GNOME Terminal profiles (all 17 Gogh themes + Breeze default)
+dconf load /org/gnome/terminal/ < "$DIR/terminal-profiles.ini"
+
 echo "GNOME preferences restored."
 echo "Note: gtk-theme/icon-theme may need manual adjustment after a distro upgrade."
