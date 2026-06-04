@@ -62,9 +62,9 @@ add_repo "mattermost" "mattermost.gpg" \
 if [ ! -f /etc/apt/sources.list.d/nvidia-container-toolkit.list ]; then
     echo "  [add]  nvidia-container-toolkit"
     curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
-        | gpg --dearmor | sudo tee /usr/share/keyrings/nvidia-container-toolkit.gpg > /dev/null
+        | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
     curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
-        | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit.gpg] https://#g' \
+        | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
         | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null
 else
     echo "  [skip] nvidia-container-toolkit repo already configured"
