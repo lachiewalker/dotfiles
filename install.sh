@@ -4,25 +4,26 @@ set -euo pipefail
 REPO="https://github.com/lachiewalker/dotfiles.git"
 NVM_VERSION="v0.40.4"
 NODE_VERSION="22.14.0"
+DOTFILES="$HOME/Projects/repos/dotfiles"
 
 # bw CLI is a Node app that fails on IPv6 — force IPv4 for this entire script.
 # ~/.bashrc sets this normally, but isn't sourced until after chezmoi apply.
 export NODE_OPTIONS="--dns-result-order=ipv4first --no-network-family-autoselection"
 
-# 1. git
+# ── 1. git ─────────────────────────────────────────────────────────────────────
 if ! command -v git &>/dev/null; then
     echo "==> Installing git..."
     sudo apt-get update -qq
     sudo apt-get install -y git
 fi
 
-# 2. chezmoi
+# ── 2. chezmoi ─────────────────────────────────────────────────────────────────
 if ! command -v chezmoi &>/dev/null; then
     echo "==> Installing chezmoi..."
     sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 fi
 
-# 3. nvm + node (needed before bw CLI)
+# ── 3. nvm + node (needed before bw CLI) ──────────────────────────────────────
 export NVM_DIR="$HOME/.nvm"
 if [ ! -s "$NVM_DIR/nvm.sh" ]; then
     echo "==> Installing nvm ${NVM_VERSION}..."
@@ -36,13 +37,13 @@ if ! nvm ls "$NODE_VERSION" &>/dev/null; then
 fi
 nvm use "$NODE_VERSION"
 
-# 4. Bitwarden CLI
+# ── 4. Bitwarden CLI ───────────────────────────────────────────────────────────
 if ! command -v bw &>/dev/null; then
     echo "==> Installing Bitwarden CLI..."
     npm install -g @bitwarden/cli
 fi
 
-# 5. Bitwarden login + unlock
+# ── 5. Bitwarden login + unlock ────────────────────────────────────────────────
 BW_STATUS=$(bw status 2>/dev/null | grep -o '"status":"[^"]*"' | cut -d'"' -f4 || echo "unauthenticated")
 if [ "$BW_STATUS" = "unauthenticated" ]; then
     echo "==> Log in to Bitwarden:"
@@ -54,24 +55,61 @@ if [ -z "${BW_SESSION:-}" ]; then
     export BW_SESSION
 fi
 
-# 6. age (needed to decrypt work files before chezmoi apply)
+# ── 6. age ─────────────────────────────────────────────────────────────────────
 if ! command -v age &>/dev/null; then
     echo "==> Installing age..."
     sudo apt-get install -y age
 fi
 
-# 7. age key — must exist before chezmoi apply can decrypt encrypted files
+# ── 7. age key from Bitwarden ──────────────────────────────────────────────────
 if [ ! -f "$HOME/.age/key.txt" ]; then
-    echo ""
-    echo "  IMPORTANT: age private key not found at ~/.age/key.txt"
-    echo "  Retrieve it from Bitwarden before continuing."
-    echo "  Once placed, re-run this script."
-    exit 1
+    echo "==> Retrieving age key from Bitwarden (chezmoi/age-key)..."
+    mkdir -p "$HOME/.age"
+    chmod 700 "$HOME/.age"
+    bw get notes "chezmoi/age-key" > "$HOME/.age/key.txt"
+    chmod 600 "$HOME/.age/key.txt"
 fi
 
-# 8. Apply dotfiles
+# ── 8. Apply dotfiles ──────────────────────────────────────────────────────────
 echo "==> Applying dotfiles..."
 chezmoi init --apply "$REPO"
 
+# ── 9. apt repositories ────────────────────────────────────────────────────────
+echo "==> Adding apt repositories..."
+bash "$DOTFILES/scripts/setup-repos.sh"
+sudo apt-get update -qq
+
+# ── 10. packages ───────────────────────────────────────────────────────────────
+echo "==> Installing packages..."
+bash "$DOTFILES/scripts/install-packages.sh"
+
+# ── 11. SSH keys ───────────────────────────────────────────────────────────────
+echo "==> Generating SSH keys..."
+bash "$DOTFILES/scripts/setup-ssh.sh"
+
+# ── 12. Auth (gh, glab, SSH key registration) ─────────────────────────────────
+echo "==> Setting up auth..."
+bash "$DOTFILES/scripts/setup-auth.sh"
+
+# ── 13. GNOME settings, terminal profiles, filmholes icon ─────────────────────
+echo "==> Restoring GNOME settings..."
+bash "$DOTFILES/gnome/restore.sh"
+
+# ── 14. Wallpapers and profile pictures ───────────────────────────────────────
+echo "==> Restoring pictures..."
+bash "$DOTFILES/Pictures/restore.sh"
+
+# ── 15. NVIDIA Docker runtime (skip if no GPU) ────────────────────────────────
+if command -v nvidia-smi &>/dev/null; then
+    echo "==> Configuring NVIDIA Docker runtime..."
+    bash "$DOTFILES/scripts/setup-nvidia-docker.sh"
+fi
+
+# ── 16. Service logins ─────────────────────────────────────────────────────────
 echo ""
-echo "Dotfiles applied. Run scripts/install-packages.sh to install packages."
+echo "==> Manual steps remaining:"
+echo "  tailscale up"
+echo "  nordvpn login"
+echo "  docker login gitlab.yourcompany.com"
+echo ""
+echo "Done."
