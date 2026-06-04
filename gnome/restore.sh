@@ -10,5 +10,8 @@ dconf load /org/gnome/desktop/interface/ < "$DIR/interface.ini"
 # Restore GNOME Terminal profiles (all 17 Gogh themes + Breeze default)
 dconf load /org/gnome/terminal/ < "$DIR/terminal-profiles.ini"
 
+# Install filmholes icon (required for G_RESOURCE_OVERLAYS in ~/.profile)
+sudo cp "$DIR/filmholes.png" /usr/share/icons/filmholes.png
+
 echo "GNOME preferences restored."
 echo "Note: gtk-theme/icon-theme may need manual adjustment after a distro upgrade."
