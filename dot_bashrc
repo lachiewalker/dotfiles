@@ -1,0 +1,237 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# History
+HISTCONTROL=ignoreboth:erasedups
+HISTSIZE=10000
+HISTFILESIZE=20000
+shopt -s histappend
+
+# Window size check after each command
+shopt -s checkwinsize
+
+# Better output from less for non-text files
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# Debian chroot indicator in prompt
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# Prompt with colour
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+        color_prompt=yes
+    else
+        color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    if [ "$TMUX" ]; then
+        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$ '
+    else
+        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    fi
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+esac
+
+# Colour support for ls/grep
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# Core aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# Bash completion
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# XDG Base Directories
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+# CUDA / NVIDIA
+export PATH="$PATH:/usr/local/cuda/bin"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}/usr/local/cuda/lib64"
+export __GL_SHADER_DISK_CACHE_PATH="$XDG_CACHE_HOME/nvidia/GLCache"
+export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nvidia/ComputeCache"
+
+# XDG overrides for tools
+export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
+export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
+export JUPYTER_CONFIG_DIR="$XDG_CONFIG_HOME/jupyter"
+export KAGGLE_CONFIG_DIR="$XDG_CONFIG_HOME/kaggle"
+export KERAS_HOME="$XDG_DATA_HOME/keras"
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export GOPATH="$XDG_DATA_HOME/go"
+export npm_config_cache="$XDG_CACHE_HOME/npm"
+export npm_config_userconfig="$XDG_CONFIG_HOME/npm/npmrc"
+export WGETRC="$XDG_CONFIG_HOME/wgetrc"
+export PYTHON_HISTORY="$XDG_STATE_HOME/python/history"
+
+# History file
+mkdir -p "$HOME/.local/state/history"
+export HISTFILE="$HOME/.local/state/history/bash"
+export LESSHISTFILE=-
+export PSQL_HISTORY="$HOME/.local/state/history/psql"
+
+# AWS
+export CDK_DISABLE_CLI_TELEMETRY=true
+command -v aws_completer &>/dev/null && complete -C "$(command -v aws_completer)" aws
+
+# Rust
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Node
+export NODE_OPTIONS="--dns-result-order=ipv4first --no-network-family-autoselection"
+
+# Tool-specific init (NVM etc.) — tools write to ~/.bashrc.d/, not ~/.bashrc
+if [ -d "$HOME/.bashrc.d" ]; then
+    for f in "$HOME/.bashrc.d"/*.sh; do
+        [ -r "$f" ] && . "$f"
+    done
+    unset f
+fi
+
+# Aliases
+[ -f "$HOME/.bash_aliases" ] && . "$HOME/.bash_aliases"
+[ -f "$HOME/.bash_aliases.work" ] && . "$HOME/.bash_aliases.work"
+
+# ==================================================================
+#                          CUSTOM FUNCTIONS
+# ==================================================================
+
+dirmerge() {
+    local splits=("${@:-train val test}")
+    for split in "${splits[@]}"; do
+        for class_dir in "$split"/*/; do
+            class=$(basename "$class_dir")
+            mkdir -p "$class"
+            mv "$class_dir"* "$class"/
+        done
+    done
+}
+
+collect() {
+  find . -type f \( -name "*.mkv" -o -name "*.mp4" \) -exec mv {} . \;
+  for dir in */; do
+    if [ "$(du -sm "$dir" | cut -f1)" -lt 2 ]; then
+      rm -rf "$dir"
+    fi
+  done
+}
+
+penv() {
+    local venv_dir="${1:-.venv}"
+    python3 -m venv "$venv_dir"
+    source "$venv_dir/bin/activate"
+    pip install -U pip
+}
+
+make_filelist() {
+    ROOT="${1:-.}"
+    for dir in "$ROOT"/*/; do
+        [ -d "$dir" ] || continue
+        dirname=$(basename "$dir")
+        outfile="${ROOT}/${dirname}.txt"
+        find "$dir" -maxdepth 1 -type f -printf "%f\n" | sort > "$outfile"
+        echo "Wrote $outfile"
+    done
+}
+
+dockdown() {
+  local containers
+  containers=$(docker ps -aq)
+  if [ -z "$containers" ]; then
+    echo "No containers to remove"
+    return 0
+  fi
+  echo "Stopping and removing all containers..."
+  docker stop $containers && docker rm $containers
+  echo "Done"
+}
+
+speaches() {
+  if docker ps --filter "name=speaches" --format "{{.Names}}" | grep -q "^speaches$"; then
+    echo "speaches is already running"
+    return 0
+  fi
+  if docker ps -a --filter "name=speaches" --format "{{.Names}}" | grep -q "^speaches$"; then
+    echo "speaches container exists but is stopped, starting it..."
+    docker start speaches
+    return 0
+  fi
+  echo "Creating and starting speaches container..."
+  docker run \
+    --detach \
+    --restart unless-stopped \
+    --publish 9944:8000 \
+    --name speaches \
+    --runtime=nvidia \
+    --env NVIDIA_VISIBLE_DEVICES=all \
+    --volume hf-hub-cache:/home/ubuntu/.cache/huggingface/hub \
+    --volume ~/.config/speaches/model_aliases.json:/home/ubuntu/speaches/model_aliases.json \
+    --env 'PRELOAD_MODELS=["Systran/faster-whisper-small.en","Systran/faster-whisper-medium.en","Systran/faster-whisper-large-v3","Purfview/faster-distil-whisper-large-v3.5"]' \
+    ghcr.io/speaches-ai/speaches:latest-cuda
+}
+
+mydl() {
+    download_one() {
+        local url="$1"
+        local max_tries=5
+        local try=1
+        while (( try <= max_tries )); do
+            yt-dlp -o "%(uploader)s - %(title)s.%(ext)s" "$url" && return 0
+            echo "Retry $try/$max_tries failed for: $url" >&2
+            ((try++))
+            sleep 2
+        done
+        echo "Giving up after $max_tries attempts: $url" >&2
+        return 1
+    }
+
+    if [[ -f $1 ]]; then
+        while IFS= read -r url; do
+            [[ -z "$url" ]] && continue
+            download_one "$url"
+        done < "$1"
+    else
+        download_one "$1"
+    fi
+}
+
+# Machine-local overrides (not tracked by chezmoi)
+[ -f "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"

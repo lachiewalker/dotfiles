@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(ls *)",
+      "Bash(dir *)",
+      "Bash(tree *)",
+      "Bash(find *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(less *)",
+      "Bash(more *)",
+      "Bash(grep *)",
+      "Bash(awk *)",
+      "Bash(sed *)",
+      "Bash(wc *)",
+      "Bash(file *)",
+      "Bash(stat *)",
+      "Bash(du *)",
+      "Bash(df *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(cut *)",
+      "Bash(paste *)",
+      "Bash(tr *)",
+      "Bash(diff *)",
+      "Bash(comm *)",
+      "Bash(which *)",
+      "Bash(whereis *)",
+      "Bash(locate *)",
+      "Bash(tar -t *)",
+      "Bash(unzip -l *)",
+      "Bash(zipinfo *)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git ls-files *)",
+      "Bash(git blame *)",
+      "Bash(npm list *)",
+      "Bash(npm ls *)",
+      "Bash(pip list *)",
+      "Bash(pip show *)",
+      "Bash(cargo search *)",
+      "Bash(ps *)",
+      "Bash(top *)",
+      "Bash(htop *)",
+      "Bash(date *)",
+      "Bash(uptime *)",
+      "Bash(whoami *)",
+      "Bash(pwd *)",
+      "Bash(printenv *)",
+      "Bash(echo *)",
+      "Bash(md5sum *)",
+      "Bash(sha256sum *)",
+      "Bash(sha1sum *)",
+      "WebSearch"
+    ],
+    "deny": [
+      "Read(/etc/**)",
+      "Read(/usr/**)",
+      "Read(/bin/**)",
+      "Read(/sbin/**)",
+      "Read(/root/**)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/**)",
+      "Read(~/.keys/**)",
+      "Edit(/etc/**)",
+      "Edit(/usr/**)",
+      "Edit(/bin/**)",
+      "Edit(/sbin/**)",
+      "Edit(/root/**)",
+      "Edit(~/.ssh/**)",
+      "Edit(~/.aws/**)",
+      "Edit(~/.config/**)",
+      "Edit(~/.keys/**)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "sonnet",
+  "hooks": {
+    "PreToolUse": []
+  },
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "caveman@caveman": true
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "lachiewalker/caveman"
+      }
+    }
+  },
+  "effortLevel": "medium",
+  "preferredNotifChannel": "terminal_bell",
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  }
+}

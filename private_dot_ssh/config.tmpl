@@ -1,0 +1,22 @@
+Host github.com
+    HostName       github.com
+    User           git
+    IdentityFile   ~/.ssh/github
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+
+Host gitlab.com
+    HostName       gitlab.com
+    User           git
+    IdentityFile   ~/.ssh/gitlab
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+
+{{- if .workGitlab }}
+Host {{ .workGitlab }}
+    HostName       {{ .workGitlab }}
+    User           git
+    IdentityFile   ~/.ssh/gitlab
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+{{- end }}

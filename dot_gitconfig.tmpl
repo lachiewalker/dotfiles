@@ -1,0 +1,52 @@
+{{- $git := bitwardenFields "item" "chezmoi/git-config" -}}
+[user]
+    name  = {{ $git.name.value }}
+    email = {{ $git.email.value }}
+
+[core]
+    autocrlf = input
+
+[init]
+    defaultBranch = main
+
+[branch]
+    sort = -committerdate
+
+[tag]
+    sort = version:refname
+
+[fetch]
+    all   = true
+    prune = true
+
+[diff]
+    algorithm      = histogram
+    colorMoved     = plain
+    mnemonicPrefix = true
+    renames        = true
+    tool           = vscode
+
+[difftool "vscode"]
+    cmd = code --wait --diff $LOCAL $REMOTE
+
+[push]
+    default         = simple
+    autoSetupRemote = true
+    followTags      = true
+
+[help]
+    autocorrect = prompt
+
+[advice]
+    addIgnoredFile = false
+
+[credential "https://github.com"]
+    helper =
+    helper = !/usr/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+    helper =
+    helper = !/usr/bin/gh auth git-credential
+
+[includeIf "hasconfig:remote.*.url:*gitlab*"]
+    path = ~/.gitconfig.local

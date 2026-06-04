@@ -1,0 +1,4 @@
+fr.handbrake.ghb
+io.github.seadve.Kooha
+io.speedofsound.SpeedOfSound
+org.prismlauncher.PrismLauncher

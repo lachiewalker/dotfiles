@@ -1,0 +1,23 @@
+# ~/.profile: executed by the command interpreter for login shells.
+
+# Include .bashrc if running bash
+if [ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ]; then
+    . "$HOME/.bashrc"
+fi
+
+# ~/bin
+[ -d "$HOME/bin" ] && PATH="$HOME/bin:$PATH"
+
+# ~/.local/bin
+[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
+
+# Go
+export PATH="$PATH:/usr/local/go/bin"
+[ -d "${GOPATH:-$HOME/.local/share/go}/bin" ] && export PATH="$PATH:${GOPATH:-$HOME/.local/share/go}/bin"
+
+# Rust
+CARGO_HOME="${CARGO_HOME:-$HOME/.local/share/cargo}"
+[ -f "$CARGO_HOME/env" ] && . "$CARGO_HOME/env"
+
+# GNOME Nautilus resource overlay
+export G_RESOURCE_OVERLAYS=/org/gnome/nautilus/icons/filmholes.png=/usr/share/icons/filmholes.png

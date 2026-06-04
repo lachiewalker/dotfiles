@@ -1,0 +1,8 @@
+gimp --channel=latest/stable
+glab --channel=latest/stable
+insomnia --channel=latest/stable
+nordvpn --channel=latest/stable
+plex-desktop --channel=latest/stable
+spotify --channel=latest/stable
+steam --channel=latest/stable
+thunderbird --channel=latest/stable

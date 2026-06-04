@@ -1,0 +1,21 @@
+{{- $git := bitwardenFields "item" "chezmoi/git-config" -}}
+
+sourceDir  = {{ .chezmoi.sourceDir | quote }}
+encryption = "age"
+
+[data]
+    email      = {{ $git.email.value | quote }}
+    name       = {{ $git.name.value | quote }}
+    hostname   = {{ output "hostname" "-s" | trim | quote }}
+    profile    = {{ promptStringOnce . "profile" "Profile (desktop/server)" "desktop" | quote }}
+    workGitlab = {{ $git.workGitlab.value | quote }}
+
+[age]
+    identity  = "~/.age/key.txt"
+    recipient = "age1q0x3zxfpww6ks5dg4clmg67sqcacy307ljlr24wqg7xvhqwfqfks9jsn6j"
+
+[bitwarden]
+    unlock = "auto"
+
+[hooks.read-source-state.pre]
+    command = "{{ .chezmoi.sourceDir }}/.install-password-manager.sh"

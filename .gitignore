@@ -1,0 +1,14 @@
+# Secrets
+.env
+*.pem
+*.key
+credentials.json
+*.ovpn
+
+# Age private keys
+.age/
+
+# Editors
+*.swp
+*.swo
+.vscode/

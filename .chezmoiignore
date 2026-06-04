@@ -1,0 +1,84 @@
+# Repo management files — don't deploy to ~
+PLAN.md
+README.md
+setup.sh
+setup-bitwarden.sh
+settings/
+scripts/
+packages/
+.install-password-manager.sh
+.pre-commit-config.yaml
+
+# Machine-local overrides — gitignored, not tracked by chezmoi
+.bashrc.local
+
+# SSH: never commit private keys or machine-specific files
+.ssh/known_hosts
+.ssh/authorized_keys
+.ssh/github
+.ssh/gitlab
+.ssh/github.pub
+.ssh/gitlab.pub
+
+# GPG: import manually on each machine
+.gnupg/
+
+# Shell history
+.bash_history
+.python_history
+.lesshst
+.wget-hsts
+
+# System / runtime
+.local/share/recently-used.xbel
+.cache/
+.local/state/history/
+
+# Browser profiles
+.config/google-chrome/
+.mozilla/
+
+# AWS: config is age-encrypted in repo; credentials never committed
+.aws/config
+.aws/credentials
+.aws/sso/
+.aws/cli/cache/
+
+# Git plaintext credential store
+.git-credentials
+
+# Runtime caches managed by installers
+.cargo/
+.nvm/
+.local/lib/
+
+# Claude Code — session/cache/machine-specific (not tracked)
+.claude/projects/
+.claude/cache/
+.claude/backups/
+.claude/debug/
+.claude/downloads/
+.claude/file-history/
+.claude/history.jsonl
+.claude/paste-cache/
+.claude/plans/
+.claude/plugins/cache/
+.claude/plugins/data/
+.claude/plugins/install-counts-cache.json
+.claude/plugins/installed_plugins.json
+.claude/session-env/
+.claude/sessions/
+.claude/shell-snapshots/
+.claude/stats-cache.json
+.claude/statusline-command.sh
+.claude/tasks/
+.claude/mcp-needs-auth-cache.json
+.claude/policy-limits.json
+.claude/settings.json.bak
+.claude/ide/
+
+# Go workspace
+go/
+
+# Age keys — store private key in Bitwarden, never commit
+.age/
