@@ -10,6 +10,20 @@ DOTFILES="$HOME/Projects/repos/dotfiles"
 # ~/.bashrc sets this normally, but isn't sourced until after chezmoi apply.
 export NODE_OPTIONS="--dns-result-order=ipv4first --no-network-family-autoselection"
 
+# ── 0. Profile ─────────────────────────────────────────────────────────────────
+if [[ -n "${CHEZMOI_PROFILE:-}" ]]; then
+    echo "Using profile: ${CHEZMOI_PROFILE}"
+else
+    while true; do
+        read -rp "Profile (desktop/server): " CHEZMOI_PROFILE
+        case "$CHEZMOI_PROFILE" in
+            desktop|server) break ;;
+            *) echo "  Must be 'desktop' or 'server'." ;;
+        esac
+    done
+fi
+export CHEZMOI_PROFILE
+
 # ── 1. git ─────────────────────────────────────────────────────────────────────
 if ! command -v git &>/dev/null; then
     echo "==> Installing git..."
@@ -27,7 +41,7 @@ fi
 export NVM_DIR="$HOME/.nvm"
 if [ ! -s "$NVM_DIR/nvm.sh" ]; then
     echo "==> Installing nvm ${NVM_VERSION}..."
-    PROFILE=/dev/null curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
+    CHEZMOI_PROFILE=/dev/null curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
 fi
 # shellcheck source=/dev/null
 . "$NVM_DIR/nvm.sh"
@@ -72,13 +86,7 @@ fi
 
 # ── 8. Apply dotfiles ──────────────────────────────────────────────────────────
 echo "==> Applying dotfiles..."
-chezmoi init --apply "$REPO"
-
-# ── 8b. Read profile from chezmoi config ──────────────────────────────────────
-PROFILE=$(grep -m1 'profile\s*=' "$HOME/.config/chezmoi/chezmoi.toml" 2>/dev/null \
-    | sed 's/.*"\(.*\)".*/\1/' || echo "desktop")
-export PROFILE
-echo "==> Profile: ${PROFILE}"
+chezmoi init --apply --data "{\"profile\":\"${CHEZMOI_PROFILE}\"}" "$REPO"
 
 # ── 9. apt repositories ────────────────────────────────────────────────────────
 echo "==> Adding apt repositories..."
@@ -98,13 +106,13 @@ echo "==> Setting up auth..."
 bash "$DOTFILES/scripts/setup-auth.sh"
 
 # ── 13. GNOME settings, terminal profiles, filmholes icon ─────────────────────
-if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     echo "==> Restoring GNOME settings..."
     bash "$DOTFILES/gnome/restore.sh"
 fi
 
 # ── 14. Wallpapers and profile pictures ───────────────────────────────────────
-if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     echo "==> Restoring pictures..."
     bash "$DOTFILES/Pictures/restore.sh"
 fi
