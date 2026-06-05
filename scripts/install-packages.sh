@@ -20,6 +20,7 @@ bash "$SCRIPTS_DIR/install-go.sh"
 bash "$SCRIPTS_DIR/install-uv.sh"
 
 echo "==> Installing CLI tools..."
+bash "$SCRIPTS_DIR/install-brew-tools.sh"
 bash "$SCRIPTS_DIR/install-aws-cli.sh"
 bash "$SCRIPTS_DIR/install-session-manager.sh"
 bash "$SCRIPTS_DIR/install-coder.sh"

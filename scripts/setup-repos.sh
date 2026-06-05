@@ -18,29 +18,33 @@ add_repo() {
 
 echo "==> Setting up external apt repositories..."
 
-# VS Code
-add_repo "vscode" "microsoft.gpg" \
-    "https://packages.microsoft.com/keys/microsoft.asc" \
-    "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
+if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+    # VS Code
+    add_repo "vscode" "microsoft.gpg" \
+        "https://packages.microsoft.com/keys/microsoft.asc" \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
+fi
 
 # Docker
 add_repo "docker" "docker.gpg" \
     "https://download.docker.com/linux/ubuntu/gpg" \
     "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-# Firefox (Mozilla official — Ubuntu's apt version is a snap redirector)
-add_repo "mozilla" "mozilla.gpg" \
-    "https://packages.mozilla.org/apt/repo-signing-key.gpg" \
-    "deb [arch=amd64 signed-by=/usr/share/keyrings/mozilla.gpg] https://packages.mozilla.org/apt mozilla main"
+if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+    # Firefox (Mozilla official — Ubuntu's apt version is a snap redirector)
+    add_repo "mozilla" "mozilla.gpg" \
+        "https://packages.mozilla.org/apt/repo-signing-key.gpg" \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/mozilla.gpg] https://packages.mozilla.org/apt mozilla main"
 
-# Pin Firefox to Mozilla repo over Ubuntu's snap redirector
-if [ ! -f /etc/apt/preferences.d/mozilla-firefox ]; then
-    echo "  [add]  firefox pin"
-    sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null <<'EOF'
+    # Pin Firefox to Mozilla repo over Ubuntu's snap redirector
+    if [ ! -f /etc/apt/preferences.d/mozilla-firefox ]; then
+        echo "  [add]  firefox pin"
+        sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null <<'EOF'
 Package: firefox*
 Pin: release o=packages.mozilla.org
 Pin-Priority: 1001
 EOF
+    fi
 fi
 
 # GitHub CLI
@@ -48,15 +52,17 @@ add_repo "github-cli" "githubcli.gpg" \
     "https://cli.github.com/packages/githubcli-archive-keyring.gpg" \
     "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli.gpg] https://cli.github.com/packages stable main"
 
-# Google Chrome
-add_repo "google-chrome" "google-chrome.gpg" \
-    "https://dl.google.com/linux/linux_signing_key.pub" \
-    "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main"
+if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+    # Google Chrome
+    add_repo "google-chrome" "google-chrome.gpg" \
+        "https://dl.google.com/linux/linux_signing_key.pub" \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main"
 
-# Mattermost
-add_repo "mattermost" "mattermost.gpg" \
-    "https://deb.packages.mattermost.com/pubkey.gpg" \
-    "deb [arch=amd64 signed-by=/usr/share/keyrings/mattermost.gpg] https://deb.packages.mattermost.com stable main"
+    # Mattermost
+    add_repo "mattermost" "mattermost.gpg" \
+        "https://deb.packages.mattermost.com/pubkey.gpg" \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/mattermost.gpg] https://deb.packages.mattermost.com stable main"
+fi
 
 # NVIDIA Container Toolkit
 if [ ! -f /etc/apt/sources.list.d/nvidia-container-toolkit.list ]; then
@@ -70,10 +76,12 @@ else
     echo "  [skip] nvidia-container-toolkit repo already configured"
 fi
 
-# Signal (intentionally uses 'xenial' distro string — Signal's official method for all Ubuntu/Debian)
-add_repo "signal" "signal.gpg" \
-    "https://updates.signal.org/desktop/apt/keys.asc" \
-    "deb [arch=amd64 signed-by=/usr/share/keyrings/signal.gpg] https://updates.signal.org/desktop/apt xenial main"
+if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+    # Signal (intentionally uses 'xenial' distro string — Signal's official method for all Ubuntu/Debian)
+    add_repo "signal" "signal.gpg" \
+        "https://updates.signal.org/desktop/apt/keys.asc" \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/signal.gpg] https://updates.signal.org/desktop/apt xenial main"
+fi
 
 # Tailscale
 if [ ! -f /etc/apt/sources.list.d/tailscale.list ]; then

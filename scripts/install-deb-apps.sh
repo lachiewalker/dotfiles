@@ -19,6 +19,11 @@ install_deb() {
     rm "$tmp"
 }
 
+if [[ "${PROFILE:-desktop}" != "desktop" ]]; then
+    echo "  [skip] .deb apps — server profile"
+    exit 0
+fi
+
 echo "==> Installing .deb apps..."
 
 # Obsidian — latest release from GitHub

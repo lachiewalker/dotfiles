@@ -1,0 +1,13 @@
+brightnessctl
+code
+dconf-cli
+ffmpegthumbnailer
+firefox
+flatpak
+google-chrome-stable
+mattermost-desktop
+network-manager-openvpn-gnome
+qbittorrent
+signal-desktop
+vlc
+wl-clipboard

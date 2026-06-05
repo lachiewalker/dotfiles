@@ -74,6 +74,12 @@ fi
 echo "==> Applying dotfiles..."
 chezmoi init --apply "$REPO"
 
+# ── 8b. Read profile from chezmoi config ──────────────────────────────────────
+PROFILE=$(grep -m1 'profile\s*=' "$HOME/.config/chezmoi/chezmoi.toml" 2>/dev/null \
+    | sed 's/.*"\(.*\)".*/\1/' || echo "desktop")
+export PROFILE
+echo "==> Profile: ${PROFILE}"
+
 # ── 9. apt repositories ────────────────────────────────────────────────────────
 echo "==> Adding apt repositories..."
 bash "$DOTFILES/scripts/setup-repos.sh"
@@ -92,12 +98,16 @@ echo "==> Setting up auth..."
 bash "$DOTFILES/scripts/setup-auth.sh"
 
 # ── 13. GNOME settings, terminal profiles, filmholes icon ─────────────────────
-echo "==> Restoring GNOME settings..."
-bash "$DOTFILES/gnome/restore.sh"
+if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+    echo "==> Restoring GNOME settings..."
+    bash "$DOTFILES/gnome/restore.sh"
+fi
 
 # ── 14. Wallpapers and profile pictures ───────────────────────────────────────
-echo "==> Restoring pictures..."
-bash "$DOTFILES/Pictures/restore.sh"
+if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+    echo "==> Restoring pictures..."
+    bash "$DOTFILES/Pictures/restore.sh"
+fi
 
 # ── 15. NVIDIA Docker runtime (skip if no GPU) ────────────────────────────────
 if command -v nvidia-smi &>/dev/null; then
