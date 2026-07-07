@@ -39,6 +39,9 @@ bash "$PACKAGES_DIR/flatpak-install.sh"
 echo "==> Installing pipx tools..."
 bash "$PACKAGES_DIR/pipx-install.sh"
 
+echo "==> Setting up VPN split-tunnel..."
+bash "$SCRIPTS_DIR/setup-vpn-split-tunnel.sh"
+
 echo "==> Installing npm global packages..."
 # Ensure nvm node is active
 export NVM_DIR="$HOME/.nvm"

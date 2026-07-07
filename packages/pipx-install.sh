@@ -5,3 +5,4 @@ pipx install posting
 pipx install frogmouth
 pipx install yt-dlp
 pipx install git-filter-repo
+pipx install vpn-slice

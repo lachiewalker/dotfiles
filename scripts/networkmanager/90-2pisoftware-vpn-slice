@@ -1,0 +1,39 @@
+#!/bin/bash
+# NetworkManager dispatcher script — runs automatically on VPN up/down.
+# Installed to /etc/NetworkManager/dispatcher.d/ by scripts/setup-vpn-split-tunnel.sh
+# (this file lives outside $HOME, so it's outside chezmoi's scope — see that script).
+#
+# vpn-slice expects to be invoked like a vpnc-script (OpenConnect/vpnc calling
+# convention: $reason, $TUNDEV, $VPNGATEWAY env vars). NetworkManager's openvpn
+# plugin doesn't provide that, so we set the minimum vars it needs ourselves.
+#
+# Split-tunnel: only the listed hosts route through this VPN; everything else
+# stays on the normal connection (see `ipv4.never-default` on the NM profile,
+# set by setup-vpn-split-tunnel.sh).
+
+VPN_CONNECTION_ID="2piLachlan"
+VPN_SLICE="__VPN_SLICE_BIN__"
+VPN_GATEWAY=54.252.88.236                          # openvpn server's public endpoint
+HOSTS=(mlflow.internal.2pisoftware.com dev.versd.2pisoftware.com test.versd.2pisoftware.com)
+
+IFACE="$1"
+ACTION="$2"
+
+[ "$CONNECTION_ID" = "$VPN_CONNECTION_ID" ] || exit 0
+[ -x "$VPN_SLICE" ] || exit 0
+
+export TUNDEV="$IFACE"
+export VPNGATEWAY="$VPN_GATEWAY"
+export INTERNAL_IP4_DNS=1.1.1.1
+export INTERNAL_IP4_ADDRESS="$(ip -4 addr show dev "$IFACE" | grep -oP 'inet \K[\d.]+')"
+
+case "$ACTION" in
+  vpn-up)
+    export reason=connect
+    "$VPN_SLICE" "${HOSTS[@]}"
+    ;;
+  vpn-down)
+    export reason=disconnect
+    "$VPN_SLICE" -d "${HOSTS[@]}"
+    ;;
+esac
