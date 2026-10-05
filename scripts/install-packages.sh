@@ -24,6 +24,7 @@ bash "$SCRIPTS_DIR/install-aws-cli.sh"
 bash "$SCRIPTS_DIR/install-session-manager.sh"
 bash "$SCRIPTS_DIR/install-coder.sh"
 bash "$SCRIPTS_DIR/install-croc.sh"
+bash "$SCRIPTS_DIR/install-claude.sh"
 
 echo "==> Setting up symlinks..."
 bash "$SCRIPTS_DIR/setup-symlinks.sh"

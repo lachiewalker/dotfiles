@@ -41,7 +41,7 @@ fi
 export NVM_DIR="$HOME/.nvm"
 if [ ! -s "$NVM_DIR/nvm.sh" ]; then
     echo "==> Installing nvm ${NVM_VERSION}..."
-    CHEZMOI_PROFILE=/dev/null curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
+    PROFILE=/dev/null curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
 fi
 # shellcheck source=/dev/null
 . "$NVM_DIR/nvm.sh"
@@ -86,7 +86,10 @@ fi
 
 # ── 8. Apply dotfiles ──────────────────────────────────────────────────────────
 echo "==> Applying dotfiles..."
-chezmoi init --apply --data "{\"profile\":\"${CHEZMOI_PROFILE}\"}" "$REPO"
+# --source keeps the repo at $DOTFILES (default is ~/.local/share/chezmoi).
+# --promptString is keyed by the prompt text in .chezmoi.toml.tmpl, not the data key.
+chezmoi init --apply --source "$DOTFILES" \
+    --promptString "Profile (desktop/server)=${CHEZMOI_PROFILE}" "$REPO"
 
 # ── 9. apt repositories ────────────────────────────────────────────────────────
 echo "==> Adding apt repositories..."

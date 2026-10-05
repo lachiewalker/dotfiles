@@ -24,6 +24,6 @@ set -euo pipefail
 DIR="$(dirname "$0")"
 xargs sudo apt-get install -y < "$DIR/apt.txt"
 
-if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     xargs sudo apt-get install -y < "$DIR/apt-desktop.txt"
 fi

@@ -27,7 +27,7 @@ S5CMD_VERSION=$(curl -fsSL https://api.github.com/repos/peak/s5cmd/releases/late
 install_deb "s5cmd" \
     "https://github.com/peak/s5cmd/releases/download/v${S5CMD_VERSION}/s5cmd_${S5CMD_VERSION}_linux_amd64.deb"
 
-if [[ "${PROFILE:-desktop}" != "desktop" ]]; then
+if [[ "${CHEZMOI_PROFILE:-desktop}" != "desktop" ]]; then
     echo "  [skip] desktop .deb apps — server profile"
     exit 0
 fi

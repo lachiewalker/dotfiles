@@ -3,7 +3,7 @@ set -euo pipefail
 
 snap install glab --channel=latest/stable
 
-if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
+if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     snap install gimp --channel=latest/stable
     snap install insomnia --channel=latest/stable
     snap install plex-desktop --channel=latest/stable

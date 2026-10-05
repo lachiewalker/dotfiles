@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "${PROFILE:-desktop}" != "desktop" ]]; then
+if [[ "${CHEZMOI_PROFILE:-desktop}" != "desktop" ]]; then
     echo "  [skip] flatpak apps — server profile"
     exit 0
 fi
