@@ -10,6 +10,8 @@ packages/
 .pre-commit-config.yaml
 install.sh
 gnome/
+# Notes folder: ~/.help links here (symlink_dot_help.tmpl), so it is not deployed itself
+help/
 
 # Wallpapers and profile pictures — desktop only
 {{ if ne .profile "desktop" }}

@@ -30,6 +30,10 @@ Shell config (bashrc, aliases, profile), git identity, SSH host config, AWS conf
 
 **VPN profile import:** `scripts/setup-vpn-import.sh` fetches `2piLachlan.ovpn` from Bitwarden and imports it into NetworkManager. The file embeds a private key and cert, so it is never stored in this repo. If the Bitwarden item is missing, the script pauses and walks you through a manual import. To add more internal hosts to the split-tunnel, edit the `HOSTS` array in `scripts/networkmanager/90-2pisoftware-vpn-slice` and re-run `setup-vpn-split-tunnel.sh`.
 
+## Notes (`~/.help`)
+
+`~/.help` is a symlink to `help/` in this repo, so notes you write there are already in the repo. Commit and push them like any other change. The repo is public: keep private notes elsewhere.
+
 ## Backups (rustic)
 
 `~/.config/rustic/rustic.toml` (age-encrypted in the repo) backs up Documents, Projects, Videos, Pictures, Downloads, `~/.claude`, Minecraft world saves (official launcher and every Prism Launcher instance) and the Firefox session files (open windows and tabs only — no history, passwords or cookies). Backups run only when you start them.
