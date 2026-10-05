@@ -6,7 +6,7 @@ set -euo pipefail
 
 install_deb() {
     local name="$1" url="$2"
-    if dpkg -l "$name" &>/dev/null; then
+    if [[ "$(dpkg-query -W -f='${Status}' "$name" 2>/dev/null)" == "install ok installed" ]]; then
         echo "  [skip] ${name} already installed"
         return
     fi
@@ -14,9 +14,9 @@ install_deb() {
     local tmp
     tmp=$(mktemp --suffix=.deb)
     curl -fsSL "$url" -o "$tmp"
-    sudo dpkg -i "$tmp"
-    sudo apt-get install -f -y  # resolve any missing deps
-    rm "$tmp"
+    chmod 644 "$tmp"                 # apt's sandbox user needs to read it
+    sudo apt-get install -y "$tmp"   # installs the .deb and its dependencies
+    rm -f "$tmp"
 }
 
 echo "==> Installing .deb apps..."
@@ -32,16 +32,36 @@ if [[ "${CHEZMOI_PROFILE:-desktop}" != "desktop" ]]; then
     exit 0
 fi
 
-# Obsidian — latest release from GitHub
-OBSIDIAN_VERSION=$(curl -fsSL https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
-    | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
-install_deb "obsidian" \
-    "https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/obsidian_${OBSIDIAN_VERSION}_amd64.deb"
+# Obsidian — newest release that ships a .deb (some releases are mobile-only)
+OBSIDIAN_URL=$(curl -fsSL "https://api.github.com/repos/obsidianmd/obsidian-releases/releases?per_page=20" \
+    | grep -o '"browser_download_url": *"[^"]*_amd64\.deb"' \
+    | head -n1 | cut -d'"' -f4)
+if [[ -n "$OBSIDIAN_URL" ]]; then
+    install_deb "obsidian" "$OBSIDIAN_URL"
+else
+    echo "  [skip] obsidian — no .deb found in recent releases"
+fi
 
 # Zoom
 install_deb "zoom" "https://zoom.us/client/latest/zoom_amd64.deb"
 
-# Minecraft (official launcher)
-install_deb "minecraft-launcher" "https://launcher.mojang.com/download/Minecraft.deb"
+# Minecraft (official launcher) — tarball; Mojang's .deb has dependencies newer Ubuntu no longer has
+if [[ ! -x "$HOME/.local/opt/minecraft-launcher/minecraft-launcher" ]]; then
+    echo "  [install] minecraft-launcher"
+    mkdir -p "$HOME/.local/opt" "$HOME/.local/share/applications"
+    curl -fsSL https://launcher.mojang.com/download/Minecraft.tar.gz \
+        | tar -xz -C "$HOME/.local/opt"
+    ln -sf "$HOME/.local/opt/minecraft-launcher/minecraft-launcher" "$HOME/.local/bin/minecraft-launcher"
+    cat > "$HOME/.local/share/applications/minecraft-launcher.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Minecraft Launcher
+Exec=$HOME/.local/opt/minecraft-launcher/minecraft-launcher
+Icon=minecraft
+Categories=Game;
+EOF
+else
+    echo "  [skip] minecraft-launcher already installed"
+fi
 
 echo "==> Done."

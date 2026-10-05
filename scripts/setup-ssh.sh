@@ -3,11 +3,7 @@
 # Safe to re-run — skips any key that already exists.
 set -euo pipefail
 
-if [[ -z "${1:-}" ]]; then
-    read -rp "SSH key email: " EMAIL
-else
-    EMAIL="$1"
-fi
+EMAIL="${1:-}"
 
 generate_key() {
     local name="$1"
@@ -18,11 +14,15 @@ generate_key() {
         return
     fi
 
+    # Ask only when a key is missing; the email is just the key's comment
+    if [[ -z "$EMAIL" ]]; then
+        read -rp "SSH key email: " EMAIL </dev/tty
+    fi
     ssh-keygen -t ed25519 -C "$EMAIL" -f "$keyfile" -N ""
     echo "  Generated $keyfile"
 }
 
-echo "==> Generating SSH keys (email: $EMAIL)"
+echo "==> Generating SSH keys"
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
 generate_key github

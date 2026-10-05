@@ -27,6 +27,6 @@ smartmontools
 sqlite3
 tailscale
 testdisk
-tldr
+tealdeer
 tmux
 tree

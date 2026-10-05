@@ -46,14 +46,13 @@ if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
         "https://packages.mozilla.org/apt/repo-signing-key.gpg" \
         "deb [arch=amd64 signed-by=/usr/share/keyrings/mozilla.gpg] https://packages.mozilla.org/apt mozilla main"
 
-    # Pin Firefox to Mozilla repo over Ubuntu's snap redirector
-    if [ ! -f /etc/apt/preferences.d/mozilla-firefox ]; then
+    # Pin Firefox to Mozilla repo over Ubuntu's snap redirector.
+    # Match by host: the repo's Release "Origin" field is an internal
+    # namespace string, so "release o=packages.mozilla.org" never matches.
+    FIREFOX_PIN=$'Package: firefox*\nPin: origin packages.mozilla.org\nPin-Priority: 1001'
+    if [ "$(cat /etc/apt/preferences.d/mozilla-firefox 2>/dev/null)" != "$FIREFOX_PIN" ]; then
         echo "  [add]  firefox pin"
-        sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null <<'EOF'
-Package: firefox*
-Pin: release o=packages.mozilla.org
-Pin-Priority: 1001
-EOF
+        printf '%s\n' "$FIREFOX_PIN" | sudo tee /etc/apt/preferences.d/mozilla-firefox > /dev/null
     fi
 fi
 

@@ -76,17 +76,32 @@ echo ""
 echo "==> Tailscale"
 if tailscale status &>/dev/null; then
     echo "  Already connected, skipping"
-else
-    sudo tailscale up
+# Without --timeout, `tailscale up` blocks forever if the login never completes
+# (wrong account in the browser, or the device waits for admin approval)
+elif ! sudo tailscale up --timeout=5m; then
+    pause_for_user "Finish the Tailscale login" \
+        "tailscale up did not finish within 5 minutes." \
+        "Check 'tailscale status'. Approve this machine in the admin console if needed," \
+        "or run 'sudo tailscale up' again in another terminal."
 fi
 
 # ── Coder ─────────────────────────────────────────────────────────────────────
 echo ""
-echo "==> Coder SSH config"
-if command -v coder &>/dev/null; then
-    coder config-ssh
-else
+echo "==> Coder"
+if ! command -v coder &>/dev/null; then
     echo "  coder not installed, skipping"
+else
+    if coder whoami &>/dev/null; then
+        echo "  Already logged in, skipping login"
+    else
+        # Asks for the deployment URL, then opens the browser
+        coder login || true
+    fi
+    if coder whoami &>/dev/null; then
+        coder config-ssh --yes
+    else
+        echo "  Not logged in — later run: coder login && coder config-ssh --yes"
+    fi
 fi
 
 echo ""

@@ -21,6 +21,19 @@ DOTFILES="$HOME/Projects/repos/dotfiles"
 # ~/.bashrc sets this normally, but isn't sourced until after chezmoi apply.
 export NODE_OPTIONS="--dns-result-order=ipv4first --no-network-family-autoselection"
 
+# chezmoi and other user-local tools install here. On a fresh machine ~/.local/bin
+# did not exist at login, so the stock ~/.profile did not put it on PATH.
+mkdir -p "$HOME/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
+
+# Never blank, lock or suspend on idle (permanent). Prompts in this script can wait
+# a long time, and a locked screen looks like the session logged out.
+if command -v gsettings &>/dev/null; then
+    gsettings set org.gnome.desktop.session idle-delay 0
+    gsettings set org.gnome.desktop.screensaver lock-enabled false
+    gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+fi
+
 # ── 0. Profile ─────────────────────────────────────────────────────────────────
 if [[ -n "${CHEZMOI_PROFILE:-}" ]]; then
     echo "Using profile: ${CHEZMOI_PROFILE}"
@@ -135,12 +148,18 @@ bash "$DOTFILES/scripts/setup-auth.sh"
 WORK_GITLAB="$(chezmoi execute-template '{{ .workGitlab }}' 2>/dev/null || true)"
 if [[ -n "$WORK_GITLAB" ]]; then
     REGISTRY="${WORK_GITLAB}:5050"
-    echo "==> Docker login to ${REGISTRY} (use a GitLab personal access token as the password)"
-    # sg: run with the new docker group before the next login applies it
-    if ! sg docker -c "docker login ${REGISTRY}"; then
-        pause_for_user "Log in to the Docker registry" \
-            "Automatic login failed. Run this in another terminal:" \
-            "sg docker -c 'docker login ${REGISTRY}'"
+    # The docker group from step 11 applies only after the next login, and there
+    # is no sg/newgrp on newer Ubuntu. So log in now only if docker already works.
+    if docker info &>/dev/null; then
+        echo "==> Docker login to ${REGISTRY} (use a GitLab personal access token as the password)"
+        if ! docker login "${REGISTRY}"; then
+            pause_for_user "Log in to the Docker registry" \
+                "Automatic login failed. Run this in another terminal:" \
+                "docker login ${REGISTRY}"
+        fi
+    else
+        DOCKER_LOGIN_LATER="docker login ${REGISTRY}   (GitLab personal access token as the password)"
+        echo "  [later] ${DOCKER_LOGIN_LATER} — after the reboot"
     fi
 fi
 
@@ -174,5 +193,6 @@ fi
 pause_for_user "Reboot" \
     "Reboot to apply the docker group, PATH changes in ~/.profile and the NVIDIA driver." \
     "After the reboot: connect the 2pi VPN once and enter its password when asked." \
-    "Open Firefox: your windows and tabs come back from the backup."
+    "Open Firefox: your windows and tabs come back from the backup." \
+    ${DOCKER_LOGIN_LATER:+"Then run: ${DOCKER_LOGIN_LATER}"}
 echo "Done."

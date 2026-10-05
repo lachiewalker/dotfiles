@@ -14,6 +14,8 @@ curl -fsSL https://raw.githubusercontent.com/lachiewalker/dotfiles/main/install.
 
 Steps that cannot be automated pause with instructions and wait for Enter. The last step asks you to reboot.
 
+On desktop, `install.sh` turns off screen blanking, screen lock and idle suspend on AC power (permanently), so the screen does not lock while a step waits for you.
+
 ## What's tracked
 
 Shell config (bashrc, aliases, profile), git identity, SSH host config, AWS config, tmux, Docker credential helper, Claude Code settings and skills, GNOME interface preferences, GNOME Terminal profiles and matching Ptyxis palettes, wallpapers, and profile pictures. Work-specific files (AWS config, work aliases) are age-encrypted. Secrets (name, email, work GitLab hostname) are templated from Bitwarden — nothing sensitive is stored in plaintext in the repo.
