@@ -14,7 +14,7 @@ curl -fsSL https://raw.githubusercontent.com/lachiewalker/dotfiles/main/install.
 
 Steps that cannot be automated pause with instructions and wait for Enter. The last step asks you to reboot.
 
-On desktop, `install.sh` turns off screen blanking, screen lock and idle suspend on AC power (permanently), so the screen does not lock while a step waits for you.
+On desktop, `install.sh` turns off screen blanking, screen lock and idle suspend on AC power (permanently), so the screen does not lock while a step waits for you. `gnome/restore.sh` sets them again, with the other GNOME settings (dark mode, clock, dock click-to-minimize).
 
 ## What's tracked
 
