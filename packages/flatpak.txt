@@ -1,3 +1,4 @@
+com.calibre_ebook.calibre
 fr.handbrake.ghb
 io.github.seadve.Kooha
 io.speedofsound.SpeedOfSound
