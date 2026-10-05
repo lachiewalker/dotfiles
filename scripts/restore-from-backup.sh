@@ -11,7 +11,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
-FIREFOX_DIR="$HOME/.mozilla/firefox"
+# Newer Firefox keeps profiles in the XDG folder; older installs use ~/.mozilla.
+# Firefox uses ~/.mozilla/firefox only if it already exists.
+FIREFOX_XDG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/mozilla/firefox"
+FIREFOX_LEGACY_DIR="$HOME/.mozilla/firefox"
+if [ -f "$FIREFOX_LEGACY_DIR/installs.ini" ]; then
+    FIREFOX_DIR="$FIREFOX_LEGACY_DIR"
+else
+    FIREFOX_DIR="$FIREFOX_XDG_DIR"
+fi
 
 if ! command -v rustic &>/dev/null; then
     echo "  [skip] rustic not installed — run this script again after cargo-install.sh"
@@ -69,10 +77,20 @@ fi
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"; stty echo </dev/tty' EXIT
-if ! rustic restore --filter-paths "$FIREFOX_DIR" "latest:$FIREFOX_DIR" "$tmp"; then
+# Snapshots made on older installs back up the ~/.mozilla path
+restored=""
+for src in "$FIREFOX_XDG_DIR" "$FIREFOX_LEGACY_DIR"; do
+    if rustic snapshots --filter-paths "$src" 2>/dev/null | grep -qE '^\| [0-9a-f]{8} '; then
+        rustic restore --filter-paths "$src" "latest:$src" "$tmp"
+        restored="$src"
+        break
+    fi
+done
+if [ -z "$restored" ]; then
     echo "  [warn] no Firefox snapshot found"
     exit 0
 fi
+echo "  [restore] session from snapshot of $restored"
 
 # Newest of the clean-exit file and the running-session file (rustic keeps mtimes)
 session=$(find "$tmp" -type f \( -name sessionstore.jsonlz4 -o -name recovery.jsonlz4 \) -printf '%T@ %p\n' \
