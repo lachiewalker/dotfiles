@@ -84,6 +84,7 @@ Pictures/
 .claude/policy-limits.json
 .claude/settings.json.bak
 .claude/ide/
+.claude/skills/synced/
 
 # Go workspace
 go/
