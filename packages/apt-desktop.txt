@@ -6,6 +6,7 @@ firefox
 flatpak
 google-chrome-stable
 mattermost-desktop
+mullvad-vpn
 network-manager-openvpn-gnome
 qbittorrent
 signal-desktop

@@ -2,7 +2,6 @@
 set -euo pipefail
 
 snap install glab --channel=latest/stable
-snap install nordvpn --channel=latest/stable
 
 if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
     snap install gimp --channel=latest/stable

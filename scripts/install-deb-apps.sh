@@ -19,12 +19,18 @@ install_deb() {
     rm "$tmp"
 }
 
+echo "==> Installing .deb apps..."
+
+# s5cmd — latest release from GitHub (not in the Ubuntu archive)
+S5CMD_VERSION=$(curl -fsSL https://api.github.com/repos/peak/s5cmd/releases/latest \
+    | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+install_deb "s5cmd" \
+    "https://github.com/peak/s5cmd/releases/download/v${S5CMD_VERSION}/s5cmd_${S5CMD_VERSION}_linux_amd64.deb"
+
 if [[ "${PROFILE:-desktop}" != "desktop" ]]; then
-    echo "  [skip] .deb apps — server profile"
+    echo "  [skip] desktop .deb apps — server profile"
     exit 0
 fi
-
-echo "==> Installing .deb apps..."
 
 # Obsidian — latest release from GitHub
 OBSIDIAN_VERSION=$(curl -fsSL https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \

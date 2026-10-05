@@ -16,6 +16,16 @@ add_repo() {
     echo "$list_entry" | sudo tee "$list_file" > /dev/null
 }
 
+add_ppa() {
+    local ppa="$1" sources_file="$2"
+    if [ -f "/etc/apt/sources.list.d/${sources_file}" ]; then
+        echo "  [skip] ppa:${ppa} already configured"
+        return
+    fi
+    echo "  [add]  ppa:${ppa}"
+    sudo add-apt-repository -y -n "ppa:${ppa}"
+}
+
 echo "==> Setting up external apt repositories..."
 
 if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
@@ -62,7 +72,23 @@ if [[ "${PROFILE:-desktop}" == "desktop" ]]; then
     add_repo "mattermost" "mattermost.gpg" \
         "https://deb.packages.mattermost.com/pubkey.gpg" \
         "deb [arch=amd64 signed-by=/usr/share/keyrings/mattermost.gpg] https://deb.packages.mattermost.com stable main"
+
+    # Mullvad VPN
+    add_repo "mullvad" "mullvad.gpg" \
+        "https://repository.mullvad.net/deb/mullvad-keyring.asc" \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/mullvad.gpg] https://repository.mullvad.net/deb/stable stable main"
+
+    # Plex Media Server
+    add_repo "plexmediaserver" "plexmediaserver.gpg" \
+        "https://downloads.plex.tv/plex-keys/PlexSign.key" \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/plexmediaserver.gpg] https://downloads.plex.tv/repo/deb public main"
+
+    # qBittorrent (stable PPA — newer than the Ubuntu archive)
+    add_ppa "qbittorrent-team/qbittorrent-stable" "qbittorrent-team-ubuntu-qbittorrent-stable-$(lsb_release -cs).sources"
 fi
+
+# deadsnakes — extra Python versions (python3.11 etc.)
+add_ppa "deadsnakes/ppa" "deadsnakes-ubuntu-ppa-$(lsb_release -cs).sources"
 
 # NVIDIA Container Toolkit
 if [ ! -f /etc/apt/sources.list.d/nvidia-container-toolkit.list ]; then

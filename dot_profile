@@ -12,12 +12,12 @@ fi
 [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
 
 # Go
+export GOPATH="${GOPATH:-$HOME/.go}"
 export PATH="$PATH:/usr/local/go/bin"
-[ -d "${GOPATH:-$HOME/.local/share/go}/bin" ] && export PATH="$PATH:${GOPATH:-$HOME/.local/share/go}/bin"
+[ -d "$GOPATH/bin" ] && export PATH="$PATH:$GOPATH/bin"
 
 # Rust
-CARGO_HOME="${CARGO_HOME:-$HOME/.local/share/cargo}"
-[ -f "$CARGO_HOME/env" ] && . "$CARGO_HOME/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # GNOME Nautilus resource overlay
 export G_RESOURCE_OVERLAYS=/org/gnome/nautilus/icons/filmholes.png=/usr/share/icons/filmholes.png

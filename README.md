@@ -17,7 +17,7 @@ Afterwards, log in to remaining services manually:
 
 ```bash
 tailscale up
-nordvpn login
+mullvad account login <account-number>
 docker login gitlab.yourcompany.com   # credentials stored in GNOME keyring
 ```
 

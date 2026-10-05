@@ -87,7 +87,7 @@ else
 fi
 
 # ── 7. Auth (interactive) ────────────────────────────────────────────────────
-step "7/7  Auth setup (gh, glab, NordVPN, Tailscale)"
+step "7/7  Auth setup (gh, glab, Mullvad, Tailscale)"
 echo "  This step is interactive — follow the prompts."
 echo ""
 bash "$SCRIPTS/setup-auth.sh"

@@ -8,6 +8,13 @@ scripts/
 packages/
 .install-password-manager.sh
 .pre-commit-config.yaml
+install.sh
+gnome/
+
+# Wallpapers and profile pictures — desktop only
+{{ if ne .profile "desktop" }}
+Pictures/
+{{ end }}
 
 # Machine-local overrides — gitignored, not tracked by chezmoi
 .bashrc.local
@@ -49,6 +56,7 @@ packages/
 
 # Runtime caches managed by installers
 .cargo/
+.go/
 .nvm/
 .local/lib/
 

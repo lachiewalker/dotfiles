@@ -1,13 +1,17 @@
 #!/bin/bash
 
 # VPN
-alias nordup="nordvpn connect Singapore"
-alias nordown="nordvpn disconnect"
+alias vpnup="mullvad relay set location sg && mullvad connect"
+alias vpndown="mullvad disconnect"
 
 # Docker
 alias dpss='docker ps -a --format "table {{.Names}}\t{{.Image}}\t{{.CreatedAt}}\t{{.Status}}"'
 alias dcu="docker compose up"
 alias dcdv="docker compose down -v"
+
+# AWS
+alias awswhoami="aws sts get-caller-identity"
+alias genpass='aws secretsmanager get-random-password --password-length 20 --exclude-punctuation'
 
 # System
 alias celar="clear"
@@ -16,11 +20,11 @@ alias keyoff='sudo brightnessctl -d asus::kbd_backlight s 0%'
 
 # Python
 alias venv="source .venv/bin/activate"
-alias genv="source ~/.global/bin/activate"
 
-# Media
+# Media / IO
+alias gdl="gallery-dl"
 alias dlp='yt-dlp -o "%(uploader)s - %(title)s.%(ext)s" --recode-video mp4'
+alias securezip="7z a -p -mhe=on -mx=1"
 
 # Misc
-alias n8n="docker run -it --rm --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n"
 alias gpt="sgpt --repl temp"

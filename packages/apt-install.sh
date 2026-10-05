@@ -5,6 +5,7 @@ set -euo pipefail
 #   gh:                      cli.github.com
 #   nvidia-container-toolkit: nvidia.github.io
 #   tailscale:               pkgs.tailscale.com/stable/ubuntu
+#   deadsnakes:              ppa:deadsnakes/ppa (repo only, no package listed)
 #
 # Desktop-only repos (setup-repos.sh, skipped on server):
 #   code:                    packages.microsoft.com
@@ -12,8 +13,12 @@ set -euo pipefail
 #   google-chrome-stable:    dl.google.com
 #   mattermost-desktop:      deb.packages.mattermost.com
 #   signal-desktop:          updates.signal.org
+#   mullvad-vpn:             repository.mullvad.net
+#   qbittorrent:             ppa:qbittorrent-team/qbittorrent-stable
+#   plexmediaserver:         downloads.plex.tv (repo only, no package listed)
 #
-# Desktop-only .deb downloads (see scripts/install-deb-apps.sh):
+# .deb downloads (see scripts/install-deb-apps.sh):
+#   s5cmd (all profiles)
 #   obsidian, zoom
 
 DIR="$(dirname "$0")"

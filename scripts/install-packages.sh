@@ -20,12 +20,10 @@ bash "$SCRIPTS_DIR/install-go.sh"
 bash "$SCRIPTS_DIR/install-uv.sh"
 
 echo "==> Installing CLI tools..."
-bash "$SCRIPTS_DIR/install-brew-tools.sh"
 bash "$SCRIPTS_DIR/install-aws-cli.sh"
 bash "$SCRIPTS_DIR/install-session-manager.sh"
 bash "$SCRIPTS_DIR/install-coder.sh"
 bash "$SCRIPTS_DIR/install-croc.sh"
-bash "$SCRIPTS_DIR/install-ollama.sh"
 
 echo "==> Setting up symlinks..."
 bash "$SCRIPTS_DIR/setup-symlinks.sh"
@@ -38,6 +36,12 @@ bash "$PACKAGES_DIR/flatpak-install.sh"
 
 echo "==> Installing pipx tools..."
 bash "$PACKAGES_DIR/pipx-install.sh"
+
+echo "==> Installing uv tools..."
+bash "$PACKAGES_DIR/uv-tools-install.sh"
+
+echo "==> Installing cargo tools..."
+bash "$PACKAGES_DIR/cargo-install.sh"
 
 echo "==> Setting up VPN split-tunnel..."
 bash "$SCRIPTS_DIR/setup-vpn-split-tunnel.sh"

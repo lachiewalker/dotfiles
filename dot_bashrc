@@ -90,13 +90,11 @@ export __GL_SHADER_DISK_CACHE_PATH="$XDG_CACHE_HOME/nvidia/GLCache"
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nvidia/ComputeCache"
 
 # XDG overrides for tools
-export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
 export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
 export JUPYTER_CONFIG_DIR="$XDG_CONFIG_HOME/jupyter"
 export KAGGLE_CONFIG_DIR="$XDG_CONFIG_HOME/kaggle"
 export KERAS_HOME="$XDG_DATA_HOME/keras"
-export CARGO_HOME="$XDG_DATA_HOME/cargo"
-export GOPATH="$XDG_DATA_HOME/go"
+export GOPATH="$HOME/.go"
 export npm_config_cache="$XDG_CACHE_HOME/npm"
 export npm_config_userconfig="$XDG_CONFIG_HOME/npm/npmrc"
 export WGETRC="$XDG_CONFIG_HOME/wgetrc"
@@ -146,9 +144,23 @@ dirmerge() {
 }
 
 collect() {
-  find . -type f \( -name "*.mkv" -o -name "*.mp4" \) -exec mv {} . \;
+  local all=0 size=2
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --all) all=1 ;;
+      --size) size="$2"; shift ;;
+    esac
+    shift
+  done
+
+  if [ "$all" -eq 1 ]; then
+    find . -mindepth 2 -type f -exec mv {} . \;
+  else
+    find . -type f \( -name "*.mkv" -o -name "*.mp4" \) -exec mv {} . \;
+  fi
+
   for dir in */; do
-    if [ "$(du -sm "$dir" | cut -f1)" -lt 2 ]; then
+    if [ "$(du -sm "$dir" | cut -f1)" -lt "$size" ]; then
       rm -rf "$dir"
     fi
   done

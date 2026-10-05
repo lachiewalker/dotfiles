@@ -111,23 +111,17 @@ if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     bash "$DOTFILES/gnome/restore.sh"
 fi
 
-# ── 14. Wallpapers and profile pictures ───────────────────────────────────────
-if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
-    echo "==> Restoring pictures..."
-    bash "$DOTFILES/Pictures/restore.sh"
-fi
-
-# ── 15. NVIDIA Docker runtime (skip if no GPU) ────────────────────────────────
+# ── 14. NVIDIA Docker runtime (skip if no GPU) ────────────────────────────────
 if command -v nvidia-smi &>/dev/null; then
     echo "==> Configuring NVIDIA Docker runtime..."
     bash "$DOTFILES/scripts/setup-nvidia-docker.sh"
 fi
 
-# ── 16. Service logins ─────────────────────────────────────────────────────────
+# ── 15. Service logins ─────────────────────────────────────────────────────────
 echo ""
 echo "==> Manual steps remaining:"
 echo "  tailscale up"
-echo "  nordvpn login"
+echo "  mullvad account login <account-number>"
 echo "  docker login gitlab.yourcompany.com"
 echo ""
 echo "Done."

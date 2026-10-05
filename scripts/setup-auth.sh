@@ -42,13 +42,16 @@ else
     echo "  workGitlab not configured in chezmoi, skipping"
 fi
 
-# ── NordVPN ───────────────────────────────────────────────────────────────────
+# ── Mullvad ───────────────────────────────────────────────────────────────────
 echo ""
-echo "==> NordVPN login"
-if nordvpn account &>/dev/null; then
+echo "==> Mullvad login"
+if ! command -v mullvad &>/dev/null; then
+    echo "  mullvad not installed, skipping"
+elif mullvad account get &>/dev/null; then
     echo "  Already logged in, skipping"
 else
-    nordvpn login
+    read -rp "  Mullvad account number: " MULLVAD_ACCOUNT
+    mullvad account login "$MULLVAD_ACCOUNT"
 fi
 
 # ── Tailscale ─────────────────────────────────────────────────────────────────
