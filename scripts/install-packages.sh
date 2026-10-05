@@ -10,6 +10,8 @@ bash "$SCRIPTS_DIR/setup-repos.sh"
 echo "==> Installing apt packages..."
 bash "$PACKAGES_DIR/apt-install.sh"
 
+command -v tldr &>/dev/null && tldr --update || true
+
 echo "==> Installing .deb apps..."
 bash "$SCRIPTS_DIR/install-deb-apps.sh"
 
