@@ -19,7 +19,7 @@ set -euo pipefail
 #
 # .deb downloads (see scripts/install-deb-apps.sh):
 #   s5cmd (all profiles)
-#   obsidian, zoom
+#   obsidian, zoom, minecraft-launcher
 
 DIR="$(dirname "$0")"
 xargs sudo apt-get install -y < "$DIR/apt.txt"

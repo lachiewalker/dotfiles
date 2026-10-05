@@ -28,6 +28,22 @@ Shell config (bashrc, aliases, profile), git identity, SSH host config, AWS conf
 
 **VPN profile import:** `scripts/setup-vpn-import.sh` fetches `2piLachlan.ovpn` from Bitwarden and imports it into NetworkManager. The file embeds a private key and cert, so it is never stored in this repo. If the Bitwarden item is missing, the script pauses and walks you through a manual import. To add more internal hosts to the split-tunnel, edit the `HOSTS` array in `scripts/networkmanager/90-2pisoftware-vpn-slice` and re-run `setup-vpn-split-tunnel.sh`.
 
+## Backups (rustic)
+
+`~/.config/rustic/rustic.toml` (age-encrypted in the repo) backs up Documents, Projects, Videos, Pictures, Downloads, `~/.claude`, Minecraft world saves (official launcher and every Prism Launcher instance) and the Firefox session files (open windows and tabs only — no history, passwords or cookies). Backups run only when you start them.
+
+On a new desktop install, `scripts/restore-from-backup.sh` (called from `install.sh`) restores the Firefox session. It waits while you get AWS session tokens in Firefox, then asks you to paste the `export AWS_...` lines and the rustic password. You can run it again later.
+
+Minecraft saves are not restored automatically. To restore them, export your AWS session tokens, then run:
+
+```bash
+rustic restore --filter-paths "$HOME/.minecraft/saves,$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances" latest /tmp/mc-saves
+```
+
+The worlds land under `/tmp/mc-saves/home/<user>/...` with their original paths. Copy each world folder into `~/.minecraft/saves/` or into the matching Prism instance's `minecraft/saves/`.
+
+**Before you wipe a machine:** close Firefox, then run `rustic backup`.
+
 ## Shell init pattern
 
 Tools that self-install shell config write to `~/.bashrc.d/`, not `~/.bashrc`. Install scripts use `PROFILE=/dev/null` to prevent tools from modifying `~/.bashrc` directly.

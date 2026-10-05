@@ -41,4 +41,7 @@ install_deb "obsidian" \
 # Zoom
 install_deb "zoom" "https://zoom.us/client/latest/zoom_amd64.deb"
 
+# Minecraft (official launcher)
+install_deb "minecraft-launcher" "https://launcher.mojang.com/download/Minecraft.deb"
+
 echo "==> Done."

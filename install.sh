@@ -152,20 +152,27 @@ if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     bash "$DOTFILES/scripts/setup-vpn-split-tunnel.sh"
 fi
 
-# ── 16. GNOME settings, terminal profiles, filmholes icon ─────────────────────
+# ── 16. Restore Firefox session from backup (desktop) ─────────────────────────
+if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
+    echo "==> Restoring Firefox session from backup..."
+    bash "$DOTFILES/scripts/restore-from-backup.sh"
+fi
+
+# ── 17. GNOME settings, terminal profiles, filmholes icon ─────────────────────
 if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     echo "==> Restoring GNOME settings..."
     bash "$DOTFILES/gnome/restore.sh"
 fi
 
-# ── 17. NVIDIA Docker runtime (skip if no GPU) ────────────────────────────────
+# ── 18. NVIDIA Docker runtime (skip if no GPU) ────────────────────────────────
 if command -v nvidia-smi &>/dev/null; then
     echo "==> Configuring NVIDIA Docker runtime..."
     bash "$DOTFILES/scripts/setup-nvidia-docker.sh"
 fi
 
-# ── 18. Finish ─────────────────────────────────────────────────────────────────
+# ── 19. Finish ─────────────────────────────────────────────────────────────────
 pause_for_user "Reboot" \
     "Reboot to apply the docker group, PATH changes in ~/.profile and the NVIDIA driver." \
-    "After the reboot: connect the 2pi VPN once and enter its password when asked."
+    "After the reboot: connect the 2pi VPN once and enter its password when asked." \
+    "Open Firefox: your windows and tabs come back from the backup."
 echo "Done."
