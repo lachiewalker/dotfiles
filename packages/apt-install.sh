@@ -25,5 +25,7 @@ DIR="$(dirname "$0")"
 xargs sudo apt-get install -y < "$DIR/apt.txt"
 
 if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
-    xargs sudo apt-get install -y < "$DIR/apt-desktop.txt"
+    # --allow-downgrades: if Ubuntu's snap-wrapper 'firefox' deb (epoch 1:) is installed,
+    # the pinned Mozilla build counts as a downgrade and -y alone refuses it.
+    xargs sudo apt-get install -y --allow-downgrades < "$DIR/apt-desktop.txt"
 fi

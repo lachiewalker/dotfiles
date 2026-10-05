@@ -3,6 +3,10 @@
 # Run AFTER setup-ssh.sh. Steps that are already complete are skipped automatically.
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/pause.sh
+. "$SCRIPT_DIR/lib/pause.sh"
+
 # ── GitHub ────────────────────────────────────────────────────────────────────
 echo "==> GitHub (gh auth login)"
 if gh auth status &>/dev/null; then
@@ -24,22 +28,35 @@ echo ""
 echo "==> Testing GitHub SSH"
 ssh -T -i ~/.ssh/github git@github.com 2>&1 || true
 
-# ── GitLab ────────────────────────────────────────────────────────────────────
-echo ""
-echo "==> GitLab (glab auth login)"
-if glab auth status &>/dev/null; then
-    echo "  Already authenticated, skipping"
-else
-    glab auth login
-fi
-
-echo ""
-echo "==> Testing GitLab SSH (internal)"
-WORK_GITLAB="$(chezmoi data 2>/dev/null | grep -oP '(?<="workGitlab":")[^"]+' || true)"
+# ── GitLab (work) ─────────────────────────────────────────────────────────────
+WORK_GITLAB="$(chezmoi execute-template '{{ .workGitlab }}' 2>/dev/null || true)"
 if [[ -n "$WORK_GITLAB" ]]; then
+    echo ""
+    echo "==> GitLab (glab auth login --hostname $WORK_GITLAB)"
+    if glab auth status --hostname "$WORK_GITLAB" &>/dev/null; then
+        echo "  Already authenticated, skipping"
+    else
+        glab auth login --hostname "$WORK_GITLAB"
+    fi
+
+    echo ""
+    echo "==> Registering SSH key with GitLab"
+    if GITLAB_HOST="$WORK_GITLAB" glab ssh-key list 2>/dev/null | grep -q "$(awk '{print $2}' ~/.ssh/gitlab.pub)"; then
+        echo "  Key already registered, skipping"
+    elif GITLAB_HOST="$WORK_GITLAB" glab ssh-key add ~/.ssh/gitlab.pub --title "$(hostname -s)"; then
+        echo "  Key added: $(hostname -s)"
+    else
+        pause_for_user "Add the GitLab SSH key" \
+            "glab could not add the key automatically." \
+            "1. Copy this key: $(cat ~/.ssh/gitlab.pub)" \
+            "2. Paste it at https://${WORK_GITLAB}/-/user_settings/ssh_keys"
+    fi
+
+    echo ""
+    echo "==> Testing GitLab SSH (internal)"
     ssh -T -i ~/.ssh/gitlab "git@$WORK_GITLAB" 2>&1 || true
 else
-    echo "  workGitlab not configured in chezmoi, skipping"
+    echo "  workGitlab not configured in chezmoi, skipping GitLab"
 fi
 
 # ── Mullvad ───────────────────────────────────────────────────────────────────
@@ -74,6 +91,5 @@ fi
 
 echo ""
 echo "==> All done. Manual steps remaining:"
-echo "  - glab auth login --hostname <work-gitlab-hostname> (if internal GitLab needs separate auth)"
 echo "  - aws sso login --profile <profile> (when you need AWS access)"
 echo "  - gpg --import (if you need GPG signing)"

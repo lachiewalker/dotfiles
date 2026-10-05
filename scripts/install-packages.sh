@@ -44,9 +44,6 @@ bash "$PACKAGES_DIR/uv-tools-install.sh"
 echo "==> Installing cargo tools..."
 bash "$PACKAGES_DIR/cargo-install.sh"
 
-echo "==> Setting up VPN split-tunnel..."
-bash "$SCRIPTS_DIR/setup-vpn-split-tunnel.sh"
-
 echo "==> Installing npm global packages..."
 # Ensure nvm node is active
 export NVM_DIR="$HOME/.nvm"

@@ -112,9 +112,9 @@ fi
 # Tailscale
 if [ ! -f /etc/apt/sources.list.d/tailscale.list ]; then
     echo "  [add]  tailscale"
-    curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg" \
+    curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/$(lsb_release -cs).noarmor.gpg" \
         | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
-    curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list" \
+    curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/$(lsb_release -cs).tailscale-keyring.list" \
         | sudo tee /etc/apt/sources.list.d/tailscale.list > /dev/null
 else
     echo "  [skip] tailscale repo already configured"

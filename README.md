@@ -2,7 +2,6 @@
 
 Personal dotfiles — managed with [chezmoi](https://chezmoi.io), secrets in [Bitwarden](https://bitwarden.com), work files encrypted with [age](https://age-encryption.org).
 
-**Machine:** Ubuntu 24.04 Noble, GNOME 46  
 **Source:** `~/Projects/repos/dotfiles` (non-standard path — see chezmoi config)
 
 ## Quick start (new machine)
@@ -11,29 +10,23 @@ Personal dotfiles — managed with [chezmoi](https://chezmoi.io), secrets in [Bi
 curl -fsSL https://raw.githubusercontent.com/lachiewalker/dotfiles/main/install.sh | bash
 ```
 
-`install.sh` orchestrates everything: git → chezmoi → nvm + node → bw CLI → bw login → age key from Bitwarden → chezmoi apply → apt repos → packages → SSH keys → auth → GNOME settings → pictures → NVIDIA Docker (if GPU present).
+`install.sh` orchestrates everything: git → chezmoi → nvm + node → bw CLI → bw login → age key from Bitwarden → chezmoi apply (dotfiles, wallpapers) → NVIDIA driver (if GPU present) → apt repos and packages → docker group → SSH keys → auth (gh, glab, SSH key registration, Mullvad, Tailscale, Coder) → Docker registry login → 2pi VPN import and split-tunnel → GNOME settings → NVIDIA Docker runtime (if GPU present).
 
-Afterwards, log in to remaining services manually:
-
-```bash
-tailscale up
-mullvad account login <account-number>
-docker login gitlab.yourcompany.com   # credentials stored in GNOME keyring
-```
+Steps that cannot be automated pause with instructions and wait for Enter. The last step asks you to reboot.
 
 ## What's tracked
 
-Shell config (bashrc, aliases, profile), git identity, SSH host config, AWS config, tmux, Docker credential helper, Claude Code settings and skills, GNOME interface preferences and terminal profiles, wallpapers, and profile pictures. Work-specific files (AWS config, work aliases) are age-encrypted. Secrets (name, email, work GitLab hostname) are templated from Bitwarden — nothing sensitive is stored in plaintext in the repo.
+Shell config (bashrc, aliases, profile), git identity, SSH host config, AWS config, tmux, Docker credential helper, Claude Code settings and skills, GNOME interface preferences, GNOME Terminal profiles and matching Ptyxis palettes, wallpapers, and profile pictures. Work-specific files (AWS config, work aliases) are age-encrypted. Secrets (name, email, work GitLab hostname) are templated from Bitwarden — nothing sensitive is stored in plaintext in the repo.
 
 ## VPN split-tunnel (2pi OpenVPN)
 
-`scripts/setup-vpn-split-tunnel.sh` (called from `install-packages.sh`) installs a NetworkManager dispatcher script so only `*.2pisoftware.com` internal hosts route through the `2piLachlan` OpenVPN connection — everything else stays on the normal connection.
+`scripts/setup-vpn-split-tunnel.sh` (called from `install.sh`) installs a NetworkManager dispatcher script so only `*.2pisoftware.com` internal hosts route through the `2piLachlan` OpenVPN connection — everything else stays on the normal connection.
 
 - `packages/pipx.txt` — installs `vpn-slice`, which does the actual host-route / `/etc/hosts` management on connect/disconnect
 - `scripts/networkmanager/90-2pisoftware-vpn-slice` — the dispatcher script itself (lives outside `$HOME`, so it's outside chezmoi's scope; copied into `/etc/NetworkManager/dispatcher.d/` by the setup script, since that requires root)
 - `scripts/setup-vpn-split-tunnel.sh` — copies the dispatcher script into place and sets `ipv4.never-default` on the connection
 
-**Not automated:** importing the `.ovpn` file itself into NetworkManager — it embeds a private key/cert, so it's a manual step (import it, name the connection `2piLachlan`, then this setup script picks it up). To add more internal hosts to the split-tunnel, edit the `HOSTS` array in `scripts/networkmanager/90-2pisoftware-vpn-slice` and re-run `setup-vpn-split-tunnel.sh`.
+**VPN profile import:** `scripts/setup-vpn-import.sh` fetches `2piLachlan.ovpn` from Bitwarden and imports it into NetworkManager. The file embeds a private key and cert, so it is never stored in this repo. If the Bitwarden item is missing, the script pauses and walks you through a manual import. To add more internal hosts to the split-tunnel, edit the `HOSTS` array in `scripts/networkmanager/90-2pisoftware-vpn-slice` and re-run `setup-vpn-split-tunnel.sh`.
 
 ## Shell init pattern
 
@@ -52,7 +45,9 @@ Tools that self-install shell config write to `~/.bashrc.d/`, not `~/.bashrc`. I
 
 ```
 Bitwarden vault (chezmoi/ folder)
-    chezmoi/git  →  name, email  →  ~/.gitconfig
+    chezmoi/git-config  →  name, email, workGitlab  →  ~/.gitconfig, chezmoi data
+    chezmoi/age-key     →  notes: age private key  →  ~/.age/key.txt
+    chezmoi/2pi-vpn     →  attachment 2piLachlan.ovpn, username  →  NetworkManager VPN
 ```
 
 On each `chezmoi apply`:
