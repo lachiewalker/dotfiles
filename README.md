@@ -18,7 +18,7 @@ On desktop, `install.sh` turns off screen blanking, screen lock and idle suspend
 
 ## What's tracked
 
-Shell config (bashrc, aliases, profile), git identity, SSH host config, AWS config, tmux, Docker credential helper, Claude Code settings and skills, GNOME interface preferences, GNOME Terminal profiles and matching Ptyxis palettes, wallpapers, and profile pictures. Work-specific files (AWS config, work aliases) are age-encrypted. Secrets (name, email, work GitLab hostname) are templated from Bitwarden — nothing sensitive is stored in plaintext in the repo.
+Shell config (bashrc, aliases, profile), git identity, SSH host config, AWS config, tmux, Docker credential helper, Claude Code settings and skills, GNOME interface preferences, GNOME Terminal profiles, wallpapers, and profile pictures. Work-specific files (AWS config, work aliases) are age-encrypted. Secrets (name, email, work GitLab hostname) are templated from Bitwarden — nothing sensitive is stored in plaintext in the repo.
 
 ## VPN split-tunnel (2pi OpenVPN)
 
