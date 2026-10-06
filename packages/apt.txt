@@ -13,7 +13,6 @@ ffmpeg
 gh
 git
 golang-docker-credential-helpers
-htop
 httpie
 ncdu
 nvidia-container-toolkit
