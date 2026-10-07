@@ -16,6 +16,10 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'no
 # Ubuntu Dock: click an app icon to focus it, click again to minimize
 gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
 
+# Ptyxis: don't block logout while a tab runs a program. Since systemd 257 the
+# resulting GNOME session lock also makes `shutdown +M` fail.
+gsettings set org.gnome.Ptyxis inhibit-logout false
+
 # Restore GNOME Terminal profiles (all 17 Gogh themes + Breeze default)
 dconf load /org/gnome/terminal/ < "$DIR/terminal-profiles.ini"
 

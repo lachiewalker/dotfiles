@@ -13,9 +13,10 @@ gnome/
 # Notes folder: ~/.help links here (symlink_dot_help.tmpl), so it is not deployed itself
 help/
 
-# Wallpapers and profile pictures — desktop only
+# Wallpapers, profile pictures and desktop entry overrides — desktop only
 {{ if ne .profile "desktop" }}
 Pictures/
+.local/share/applications/
 {{ end }}
 
 # Machine-local overrides — gitignored, not tracked by chezmoi

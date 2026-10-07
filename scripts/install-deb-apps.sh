@@ -45,23 +45,4 @@ fi
 # Zoom
 install_deb "zoom" "https://zoom.us/client/latest/zoom_amd64.deb"
 
-# Minecraft (official launcher) — tarball; Mojang's .deb has dependencies newer Ubuntu no longer has
-if [[ ! -x "$HOME/.local/opt/minecraft-launcher/minecraft-launcher" ]]; then
-    echo "  [install] minecraft-launcher"
-    mkdir -p "$HOME/.local/opt" "$HOME/.local/share/applications"
-    curl -fsSL https://launcher.mojang.com/download/Minecraft.tar.gz \
-        | tar -xz -C "$HOME/.local/opt"
-    ln -sf "$HOME/.local/opt/minecraft-launcher/minecraft-launcher" "$HOME/.local/bin/minecraft-launcher"
-    cat > "$HOME/.local/share/applications/minecraft-launcher.desktop" <<EOF
-[Desktop Entry]
-Type=Application
-Name=Minecraft Launcher
-Exec=$HOME/.local/opt/minecraft-launcher/minecraft-launcher
-Icon=minecraft
-Categories=Game;
-EOF
-else
-    echo "  [skip] minecraft-launcher already installed"
-fi
-
 echo "==> Done."
