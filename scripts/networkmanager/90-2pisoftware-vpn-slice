@@ -14,7 +14,8 @@
 VPN_CONNECTION_ID="2piLachlan"
 VPN_SLICE="__VPN_SLICE_BIN__"
 VPN_GATEWAY=54.252.88.236                          # openvpn server's public endpoint
-HOSTS=(mlflow.internal.2pisoftware.com dev.versd.2pisoftware.com test.versd.2pisoftware.com)
+HOSTS=(mlflow.internal.2pisoftware.com dev.versd.2pisoftware.com test.versd.2pisoftware.com
+       internal.versd.2pisoftware.com marketplace.versd.2pisoftware.com)
 
 IFACE="$1"
 ACTION="$2"
