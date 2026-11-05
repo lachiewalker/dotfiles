@@ -15,7 +15,6 @@ set -euo pipefail
 #   signal-desktop:          updates.signal.org
 #   mullvad-vpn:             repository.mullvad.net
 #   qbittorrent:             ppa:qbittorrent-team/qbittorrent-stable
-#   plexmediaserver:         downloads.plex.tv (repo only, no package listed)
 #
 # .deb downloads (see scripts/install-deb-apps.sh):
 #   s5cmd (all profiles)

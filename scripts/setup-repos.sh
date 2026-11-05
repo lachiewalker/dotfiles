@@ -62,10 +62,24 @@ add_repo "github-cli" "githubcli.gpg" \
     "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli.gpg] https://cli.github.com/packages stable main"
 
 if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
-    # Google Chrome
-    add_repo "google-chrome" "google-chrome.gpg" \
-        "https://dl.google.com/linux/linux_signing_key.pub" \
-        "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb stable main"
+    # Google Chrome — write the same deb822 file the google-chrome-stable
+    # package manages, so its cron job does not add a duplicate source.
+    CHROME_SOURCES=/etc/apt/sources.list.d/google-chrome.sources
+    if [ -f "$CHROME_SOURCES" ]; then
+        echo "  [skip] google-chrome repo already configured"
+    else
+        echo "  [add]  google-chrome"
+        curl -fsSL "https://dl.google.com/linux/linux_signing_key.pub" | gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null
+        sudo tee "$CHROME_SOURCES" > /dev/null <<'EOF'
+X-Repolib-Name: Google Chrome
+Types: deb
+URIs: https://dl.google.com/linux/chrome-stable/deb/
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: /usr/share/keyrings/google-chrome.gpg
+EOF
+    fi
 
     # Mattermost
     add_repo "mattermost" "mattermost.gpg" \
@@ -76,11 +90,6 @@ if [[ "${CHEZMOI_PROFILE:-desktop}" == "desktop" ]]; then
     add_repo "mullvad" "mullvad.gpg" \
         "https://repository.mullvad.net/deb/mullvad-keyring.asc" \
         "deb [arch=amd64 signed-by=/usr/share/keyrings/mullvad.gpg] https://repository.mullvad.net/deb/stable stable main"
-
-    # Plex Media Server
-    add_repo "plexmediaserver" "plexmediaserver.gpg" \
-        "https://downloads.plex.tv/plex-keys/PlexSign.key" \
-        "deb [arch=amd64 signed-by=/usr/share/keyrings/plexmediaserver.gpg] https://downloads.plex.tv/repo/deb public main"
 
     # qBittorrent (stable PPA — newer than the Ubuntu archive)
     add_ppa "qbittorrent-team/qbittorrent-stable" "qbittorrent-team-ubuntu-qbittorrent-stable-$(lsb_release -cs).sources"
